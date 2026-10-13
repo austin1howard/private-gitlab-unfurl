@@ -1,0 +1,25 @@
+# Create the app at https://api.slack.com/apps -> "Create New App" -> "From an app manifest".
+# Replace gitlab.example.com with your GitLab hostname.
+display_information:
+  name: GitLab Unfurl
+  description: Shows previews for links to our GitLab.
+features:
+  bot_user:
+    display_name: GitLab Unfurl
+    always_online: false
+  unfurl_domains:
+    - gitlab.example.com
+oauth_config:
+  scopes:
+    bot:
+      - links:read
+      - links:write
+settings:
+  event_subscriptions:
+    bot_events:
+      - link_shared
+  interactivity:
+    is_enabled: false
+  org_deploy_enabled: false
+  socket_mode_enabled: true
+  token_rotation_enabled: false
