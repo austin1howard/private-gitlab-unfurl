@@ -128,10 +128,38 @@ Metric names may be rewritten by your backend (Prometheus, for example, turns th
 
 ```sh
 uv sync
-uv run pytest          # tests with coverage report
+uv run pytest          # unit tests with coverage report (e2e tests are skipped)
 uv run ruff check .
 uv run ruff format .
 ```
+
+### End-to-end tests
+
+`tests/e2e/` runs the app against a real GitLab CE container (`compose.e2e.yml`). Slack is the only part that's faked: the tests patch `WebClient` so `chat.unfurl` calls are captured instead of sent.
+
+Requires Docker with about 4 GB of free memory.
+
+```sh
+scripts/e2e.sh                     # boot GitLab, run tests, remove the container
+KEEP_GITLAB=1 scripts/e2e.sh       # leave GitLab running for faster re-runs
+uv run pytest -m e2e tests/e2e     # run against an already-running container
+docker compose -f compose.e2e.yml down -v   # stop it when done
+```
+
+The first boot takes 3 to 5 minutes. With `KEEP_GITLAB=1`, later runs take about 15 seconds.
+
+What the suite does:
+
+- Creates two root tokens with known values via `gitlab-rails runner` (`tests/e2e/seed_tokens.rb`): an admin token for seeding, and one that's already expired. This step is skipped when they already exist.
+- Seeds, under a random suffix so runs don't collide: a private group, subgroup, and project with a branch, commit, merge request, and issue; a public project; a private project the bot can't see; and a bot user who is a Reporter on the private group, with a working `read_api` token and a revoked one.
+- Checks previews for each link type, access-denied cases, expired, revoked, and invalid tokens, an unreachable API, the background health check (including token expiry), and a full `link_shared` event through the Bolt app.
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `GITLAB_IMAGE` | `gitlab/gitlab-ce:19.4.2-ce.0` | GitLab image to test against |
+| `E2E_GITLAB_PORT` | `8929` | Host port for GitLab |
+| `E2E_GITLAB_URL` | `http://localhost:8929` | URL the tests use. Change this together with `E2E_GITLAB_PORT` |
+| `E2E_GITLAB_CONTAINER` | `gitlab-unfurl-e2e` | Container name, used for `docker exec` |
 
 Layout:
 
@@ -147,5 +175,8 @@ src/gitlab_unfurl/
   formatting.py  Block Kit payloads
   health.py      token/API health state and background checker
   telemetry.py   OpenTelemetry setup and instruments
-tests/           pytest suite (no network; GitLab is faked with httpx.MockTransport)
+tests/           unit tests (no network; GitLab is faked with httpx.MockTransport)
+tests/e2e/       end-to-end tests against the GitLab container
+compose.e2e.yml  GitLab CE container for the e2e tests
+scripts/e2e.sh   runs the e2e suite
 ```

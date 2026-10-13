@@ -31,7 +31,8 @@ dev = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "--cov=gitlab_unfurl --cov-report=term-missing"
+addopts = "--cov=gitlab_unfurl --cov-report=term-missing -m 'not e2e'"
+markers = ["e2e: needs the GitLab container from compose.e2e.yml (run scripts/e2e.sh)"]
 
 [tool.ruff]
 line-length = 100

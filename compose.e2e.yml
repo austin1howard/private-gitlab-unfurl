@@ -1,0 +1,28 @@
+# Throwaway GitLab CE instance for the e2e tests. See "End-to-end tests" in README.md.
+services:
+  gitlab:
+    image: ${GITLAB_IMAGE:-gitlab/gitlab-ce:19.4.2-ce.0}
+    container_name: ${E2E_GITLAB_CONTAINER:-gitlab-unfurl-e2e}
+    ports:
+      - "${E2E_GITLAB_PORT:-8929}:8929"
+    shm_size: 256m
+    environment:
+      # external_url must match the URL the tests use so web_url values parse as ours.
+      # Everything not needed for the REST API and web UI is turned off to boot faster.
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://localhost:${E2E_GITLAB_PORT:-8929}'
+        # Fixed so the port mapping above works when E2E_GITLAB_PORT changes.
+        nginx['listen_port'] = 8929
+        gitlab_rails['initial_root_password'] = 'qT7v-Xk29-Lm4w-Rz8b'
+        gitlab_rails['usage_ping_enabled'] = false
+        prometheus_monitoring['enable'] = false
+        registry['enable'] = false
+        gitlab_kas['enable'] = false
+        puma['worker_processes'] = 0
+        sidekiq['concurrency'] = 5
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8929/-/readiness"]
+      interval: 10s
+      timeout: 5s
+      retries: 90
+      start_period: 120s
