@@ -19,6 +19,59 @@ The same "unable to show gitlab preview" message is used when the token is broke
 
 Older URLs without the `/-/` segment (`group/project/merge_requests/42`) are also recognized.
 
+### Examples
+
+These are screenshots of the app's actual Block Kit output for sample data, drawn in a Slack-style mockup. Real Slack spacing and fonts differ slightly.
+
+**Merge request**
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/previews/merge_request-dark.png">
+  <img src="docs/previews/merge_request-light.png" alt="Slack preview: merge request" width="600">
+</picture>
+
+**Commit**
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/previews/commit-dark.png">
+  <img src="docs/previews/commit-light.png" alt="Slack preview: commit" width="600">
+</picture>
+
+**Project home**
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/previews/project-dark.png">
+  <img src="docs/previews/project-light.png" alt="Slack preview: project home" width="600">
+</picture>
+
+**Group home**
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/previews/group-dark.png">
+  <img src="docs/previews/group-light.png" alt="Slack preview: group home" width="600">
+</picture>
+
+**Any other page (private, so the title is built from the URL)**
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/previews/page-dark.png">
+  <img src="docs/previews/page-light.png" alt="Slack preview: any other page (private, so the title is built from the url)" width="600">
+</picture>
+
+**User profile**
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/previews/user-dark.png">
+  <img src="docs/previews/user-light.png" alt="Slack preview: user profile" width="600">
+</picture>
+
+**No access, broken token, or GitLab down**
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/previews/denied-dark.png">
+  <img src="docs/previews/denied-light.png" alt="Slack preview: no access, broken token, or gitlab down" width="600">
+</picture>
+
 ### How "anything else" titles work
 
 GitLab does not accept API tokens on its HTML pages, so the app can't read the real `<title>` of a private page. For other links it:
@@ -179,4 +232,5 @@ tests/           unit tests (no network; GitLab is faked with httpx.MockTranspor
 tests/e2e/       end-to-end tests against the GitLab container
 compose.e2e.yml  GitLab CE container for the e2e tests
 scripts/e2e.sh   runs the e2e suite
+docs/previews/   screenshots used in this README
 ```
